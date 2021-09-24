@@ -72,7 +72,8 @@ public class TopologicalSorter {
     }
 
     public HashMap<Activity, Integer> schedule(HashSet<Activity> activites, HashSet<PrecedenceConstraint> contraintesPreced) {
-        ArrayList<Activity> ordreActivites = bruteForceSort(activites, contraintesPreced);
+        // ArrayList<Activity> ordreActivites = bruteForceSort(activites, contraintesPreced);
+        ArrayList<Activity> ordreActivites = linearTimeSort(activites, contraintesPreced);
 
         if (ordreActivites == null) {  // s'il n'y a pas de solutions, retourne null
             return null;
@@ -81,22 +82,66 @@ public class TopologicalSorter {
         HashMap<Activity, Integer> res = new HashMap<>();  // initialise la liste pour stocker le résultat
 
         Activity derniereActiv = null;  // stocke la dernière activité traitée
-        for (int i = 0; i < ordreActivites.size(); i++) {
+        for (Activity ordreActivite : ordreActivites) {
             int derniereDate;  // stocke la date du dernier élément de res
-            Activity activite = ordreActivites.get(i);  // prend l'activité i
             int dureeDerniereActiv;  // stocke la durée de la dernière activité traitée
             if (res.isEmpty()) {  // si res est vide
                 derniereDate = 0;  // la dernière durée n'existe pas, elle vaut donc 0
-                res.put(activite, derniereDate);  // la première activité se fait en date 0
-                System.out.printf("%s -> %d\n", activite.getDescription(), derniereDate);
+                res.put(ordreActivite, derniereDate);  // la première activité se fait en date 0
+                System.out.printf("%s -> %d\n", ordreActivite.getDescription(), derniereDate);
             } else {
                 dureeDerniereActiv = derniereActiv.getDuration();  // prend la durée de la dernière activité traitée
                 derniereDate = res.get(derniereActiv);  // prend la date de la dernière activité traitée
-                res.put(activite, derniereDate + dureeDerniereActiv);  // la date de la dernière activité + la durée de la suivante
-                System.out.printf("%s -> %d\n", activite.getDescription(), derniereDate + dureeDerniereActiv);
+                res.put(ordreActivite, derniereDate + dureeDerniereActiv);  // la date de la dernière activité + la durée de la suivante
+                System.out.printf("%s -> %d\n", ordreActivite.getDescription(), derniereDate + dureeDerniereActiv);
             }
-            derniereActiv = activite;  // stocke l'activité qui vient d'être traitée
+            derniereActiv = ordreActivite;  // stocke l'activité qui vient d'être traitée
         }
         return res;  // retourne un "calendrier" des activités
     }
+    public ArrayList<Activity> linearTimeSort(HashSet<Activity> activites, HashSet<PrecedenceConstraint> contraintesPreced) {
+        HashMap<Activity, Integer> nbPredecesseurs = new HashMap<>();
+        HashMap<Activity, ArrayList<Activity>> successeurs = new HashMap<>();
+
+        for (Activity activite: activites) {
+            nbPredecesseurs.put(activite, 0);  // initialise chaque activité à 0
+            successeurs.put(activite, new ArrayList<>());  // initialise chaque activité à une liste vide
+        }
+
+        for (PrecedenceConstraint contrainte: contraintesPreced) {
+            Activity firstActiv = contrainte.getFirst();
+            Activity secondActiv = contrainte.getSecond();
+
+            nbPredecesseurs.replace(secondActiv, nbPredecesseurs.get(secondActiv) + 1);
+            ArrayList<Activity> listeSuccesFirstActiv = successeurs.get(firstActiv);
+            listeSuccesFirstActiv.add(secondActiv);
+            successeurs.replace(firstActiv, listeSuccesFirstActiv);
+        }
+
+        ArrayList<Activity> L = new ArrayList<>();
+        ArrayList<Activity> res = new ArrayList<>();
+        for (Activity activite: activites) {
+            int leNombreDePredecesseurs = nbPredecesseurs.get(activite);
+            if (leNombreDePredecesseurs == 0) {
+                L.add(activite);
+            }
+        }
+        while (!L.isEmpty()) {
+            Activity activ = L.get(0);
+            res.add(activ);
+            L.remove(activ);
+            for (Activity activite: successeurs.get(activ)) {
+                nbPredecesseurs.replace(activite, nbPredecesseurs.get(activite) - 1);
+                if (nbPredecesseurs.get(activite) == 0) {
+                    L.add(activite);
+                }
+            }
+        }
+        if (res.size() == activites.size()) {
+            return res;
+        } else {
+            return null;
+        }
+    }
+
 }

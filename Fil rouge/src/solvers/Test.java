@@ -8,6 +8,7 @@ public class Test {
          TopologicalSorterTests tester = new TopologicalSorterTests();
          ok = ok && tester.testBruteForceSort();
          ok = ok && tester.testSchedule();
+         ok = ok && tester.testLinearTimeSort();
          System.out.println(ok ? "All tests passed" : "At least one test failed");
     }
 }

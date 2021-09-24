@@ -4,6 +4,7 @@ import constraints.Activity;
 import constraints.PrecedenceConstraint;
 
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -45,6 +46,25 @@ public class Demo {
 
         TopologicalSorter solver1 = new TopologicalSorter();
 
-        HashMap<Activity, Integer> calendrier = solver1.schedule(activites, contraintes);
+        // HashMap<Activity, Integer> calendrier = solver1.schedule(activites, contraintes);
+
+        ArrayList<Activity> grosseListeActiv = new ArrayList<>();
+        ArrayList<PrecedenceConstraint> grosseListeContraintes = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            int randomNum = ThreadLocalRandom.current().nextInt(1, 30);  // https://stackoverflow.com/questions/363681/how-do-i-generate-random-integers-within-a-specific-range-in-java
+            Activity laNouvelleActiv = new Activity("activ" + i, randomNum);
+            grosseListeActiv.add(laNouvelleActiv);
+        }
+        for (Activity activite: grosseListeActiv) {
+            if (!(grosseListeActiv.indexOf(activite) + 1 >= 100)) {
+                Activity activ2 = grosseListeActiv.get(grosseListeActiv.indexOf(activite) + 1);
+                PrecedenceConstraint laNouvelleContraite = new PrecedenceConstraint(activite, activ2);
+                grosseListeContraintes.add(laNouvelleContraite);
+            }
+        }
+        HashSet<Activity> grosSetActiv = new HashSet<>(grosseListeActiv);
+        HashSet<PrecedenceConstraint> grosSetContrainte = new HashSet<>(grosseListeContraintes);
+        HashMap<Activity, Integer> calendrier2 = solver1.schedule(grosSetActiv, grosSetContrainte);
     }
+
 }
