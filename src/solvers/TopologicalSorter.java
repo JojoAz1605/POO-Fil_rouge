@@ -100,47 +100,50 @@ public class TopologicalSorter {
         return res;  // retourne un "calendrier" des activités
     }
     public ArrayList<Activity> linearTimeSort(HashSet<Activity> activites, HashSet<PrecedenceConstraint> contraintesPreced) {
-        HashMap<Activity, Integer> nbPredecesseurs = new HashMap<>();
-        HashMap<Activity, ArrayList<Activity>> successeurs = new HashMap<>();
+        HashMap<Activity, Integer> nbPredecesseurs = new HashMap<>();  // créé le dico des prédecesseurs
+        HashMap<Activity, ArrayList<Activity>> successeurs = new HashMap<>();  // créé le dico des successeurs
 
         for (Activity activite: activites) {
             nbPredecesseurs.put(activite, 0);  // initialise chaque activité à 0
             successeurs.put(activite, new ArrayList<>());  // initialise chaque activité à une liste vide
         }
 
-        for (PrecedenceConstraint contrainte: contraintesPreced) {
-            Activity firstActiv = contrainte.getFirst();
-            Activity secondActiv = contrainte.getSecond();
+        for (PrecedenceConstraint contrainte: contraintesPreced) {  // parcours les contraintes
+            Activity firstActiv = contrainte.getFirst();  // prend la première activité
+            Activity secondActiv = contrainte.getSecond();  // prend la deuxième activité
 
-            nbPredecesseurs.replace(secondActiv, nbPredecesseurs.get(secondActiv) + 1);
-            ArrayList<Activity> listeSuccesFirstActiv = successeurs.get(firstActiv);
-            listeSuccesFirstActiv.add(secondActiv);
-            successeurs.replace(firstActiv, listeSuccesFirstActiv);
+            nbPredecesseurs.replace(secondActiv, nbPredecesseurs.get(secondActiv) + 1);  // incrémente le nombre de prédécesseurs de la seconde activité
+            ArrayList<Activity> listeSuccesFirstActiv = successeurs.get(firstActiv);  // créé la liste des successeurs de firstActiv
+            listeSuccesFirstActiv.add(secondActiv);  // ajoute la seconde activité à la liste des successeurs de firstActiv
+            successeurs.replace(firstActiv, listeSuccesFirstActiv);  // ajoute la première activité aux succeseurs
         }
 
-        ArrayList<Activity> L = new ArrayList<>();
-        ArrayList<Activity> res = new ArrayList<>();
-        for (Activity activite: activites) {
-            int leNombreDePredecesseurs = nbPredecesseurs.get(activite);
-            if (leNombreDePredecesseurs == 0) {
-                L.add(activite);
+        ArrayList<Activity> L = new ArrayList<>();  // créé la liste L
+        ArrayList<Activity> res = new ArrayList<>();  // pour stocker le résultat
+        for (Activity activite: activites) {  // pour toutes les activités
+            int leNombreDePredecesseurs = nbPredecesseurs.get(activite);  // prend le nombre de prédeceseurs de l'activité
+            if (leNombreDePredecesseurs == 0) {  // si il n'y en a pas
+                L.add(activite);  // ajoute l'activité à L
             }
         }
-        while (!L.isEmpty()) {
-            Activity activ = L.get(0);
-            res.add(activ);
-            L.remove(activ);
-            for (Activity activite: successeurs.get(activ)) {
-                nbPredecesseurs.replace(activite, nbPredecesseurs.get(activite) - 1);
-                if (nbPredecesseurs.get(activite) == 0) {
-                    L.add(activite);
+        while (!L.isEmpty()) {  // tant que L n'est pas vide
+            Activity activ = L.get(0);  // prend la première activité de L
+            res.add(activ);  // ajoute cette activité au résultat
+            L.remove(activ);  // retire l'activité de L
+            for (Activity activite: successeurs.get(activ)) {  // pour toutes les activités qui succèdent à l'activité
+                nbPredecesseurs.replace(activite, nbPredecesseurs.get(activite) - 1);  // décrémente son nombre de prédecesseurs
+                if (nbPredecesseurs.get(activite) == 0) {  // si le nombre de prédecesseurs de l'activité est égal à 0
+                    L.add(activite);  // rajoute l'activité à L
                 }
             }
         }
-        if (res.size() == activites.size()) {
-            return res;
-        } else {
-            return null;
+        if (res.size() == activites.size()) {  // si res à autant d'éléments que activites
+            System.out.println("Un résultat est trouvé!\nLe voici: ");
+            System.out.println(res);
+            return res;  // retourne le résultat
+        } else {  // sinon pas de résultat
+            System.out.println("Pas de résultat, null est retourné");
+            return null;  // retourne null
         }
     }
 
