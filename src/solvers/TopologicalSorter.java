@@ -20,18 +20,9 @@ public class TopologicalSorter {
             avecContraintes.add(contrainte.getSecond());
         }
 
-
-        // ----- affichage des paramètres -----
-        System.out.print("activités: ");
-        System.out.println(activites);
-        System.out.print("Contraintes: ");
-        System.out.println(contraintesPreced);
-
         while (!activitesCopy.isEmpty()) {  // tant que la copie d'activite n'est pas vide
             boolean continuer = false;  // on définit continuer à 0
             for (Activity activite: activitesCopy) {  // pour toutes les activités
-                System.out.print("Début du test pour: ");
-                System.out.println(activite.getDescription());
                 boolean ok = true;  // ok à true
                 for (PrecedenceConstraint contrainte: contraintesPreced) {  // pour toutes les contraintes
                     PrecedenceConstraint caDoitEtreCommeCa = new PrecedenceConstraint(activite, contrainte.getSecond());  // sert à vérifier que contrainte est de la bonne forme
@@ -45,8 +36,6 @@ public class TopologicalSorter {
                     }
                 }
                 if (ok) {  // si c'est ok(que l'activité n'est pas mentionnée comme seconde contrainte)
-                    System.out.print("Une activité est ajoutée au résultat: ");
-                    System.out.println(activite.getDescription());
                     res.add(activite); // l'ajoute au résultat
                     activitesCopy.remove(activite);  // et retire l'activité de la copie de la liste d'activités(pour éviter qu'elle soit prise en compte plus tard)
                     continuer = true;  // on peut donc continuer
@@ -54,19 +43,14 @@ public class TopologicalSorter {
                 }
             }
             if (!continuer) {  // aucune solution ne peut-être trouvée
-                System.out.println("Pas de résultat, null est retourné...");
                 return null;
             }
         }
         for (Activity activite: activites) {  // ajoute les éléments non soumis à des contraintes à la fin
             if (!avecContraintes.contains(activite)) {
-                System.out.print("Ajout d'une activité non soumis à une contrainte: ");
-                System.out.println(activite.getDescription());
                 res.add(activite);
             }
         }
-        System.out.print("Un résultat est retourné: ");
-        System.out.println(res);
         Collections.reverse(res);  // inverse la liste
         return res;  // et la retourne
     }
@@ -88,12 +72,10 @@ public class TopologicalSorter {
             if (res.isEmpty()) {  // si res est vide
                 derniereDate = 0;  // la dernière durée n'existe pas, elle vaut donc 0
                 res.put(ordreActivite, derniereDate);  // la première activité se fait en date 0
-                System.out.printf("%s -> %d\n", ordreActivite.getDescription(), derniereDate);
             } else {
                 dureeDerniereActiv = derniereActiv.getDuration();  // prend la durée de la dernière activité traitée
                 derniereDate = res.get(derniereActiv);  // prend la date de la dernière activité traitée
                 res.put(ordreActivite, derniereDate + dureeDerniereActiv);  // la date de la dernière activité + la durée de la suivante
-                System.out.printf("%s -> %d\n", ordreActivite.getDescription(), derniereDate + dureeDerniereActiv);
             }
             derniereActiv = ordreActivite;  // stocke l'activité qui vient d'être traitée
         }
@@ -138,11 +120,8 @@ public class TopologicalSorter {
             }
         }
         if (res.size() == activites.size()) {  // si res à autant d'éléments que activites
-            System.out.println("Un résultat est trouvé!\nLe voici: ");
-            System.out.println(res);
             return res;  // retourne le résultat
         } else {  // sinon pas de résultat
-            System.out.println("Pas de résultat, null est retourné");
             return null;  // retourne null
         }
     }
