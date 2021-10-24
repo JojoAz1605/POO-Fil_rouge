@@ -56,7 +56,7 @@ public class Demo {
             Activity laNouvelleActiv = new Activity("activ" + i, randomNum);
             grosseListeActiv.add(laNouvelleActiv);
         }
-        for (Activity activite: grosseListeActiv) {
+        for (Activity activite : grosseListeActiv) {
             if (!(grosseListeActiv.indexOf(activite) + 1 >= 100)) {
                 Activity activ2 = grosseListeActiv.get(grosseListeActiv.indexOf(activite) + 1);
                 PrecedenceConstraint laNouvelleContraite = new PrecedenceConstraint(activite, activ2);

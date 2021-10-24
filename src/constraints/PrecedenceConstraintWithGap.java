@@ -1,6 +1,8 @@
 package constraints;
 
-public class PrecedenceConstraintWithGap extends PrecedenceConstraint {
+import java.util.Map;
+
+public class PrecedenceConstraintWithGap extends PrecedenceConstraint implements Constraint {
     int maxDelay;
     int minDelay;
 
@@ -33,4 +35,34 @@ public class PrecedenceConstraintWithGap extends PrecedenceConstraint {
         }
     }
 
+    @Override
+    public boolean isSatisfied(Map<Activity, Integer> activEtDates) {
+        if (activEtDates.containsKey(this.getFirst()) && activEtDates.containsKey(this.secondActivity)) {
+            int dateFinActiv1 = activEtDates.get(this.getFirst()) + this.firstActivity.getDuration();
+            int date2 = activEtDates.get(this.getSecond());
+            if (!(dateFinActiv1 <= date2) || (this.minDelay > this.maxDelay)) {
+                return false;
+            } else {
+                boolean minDelaySatisfied;
+                boolean maxDelaySatisfied;
+                if (this.minDelay == 0) {
+                    minDelaySatisfied = true;
+                } else {
+                    minDelaySatisfied = date2 >= dateFinActiv1 + this.minDelay;
+                }
+                if (this.maxDelay == 0) {
+                    maxDelaySatisfied = dateFinActiv1 == date2;
+                } else {
+                    maxDelaySatisfied = date2 <= dateFinActiv1 + this.maxDelay;
+                }
+                return minDelaySatisfied && maxDelaySatisfied;
+            }
+        } else {
+            return false;
+        }
+    }
+    @Override
+    public String toString() {
+        return "PrecedenceConstraintWithGap:\n-minDelay= " + this.minDelay + "\n-maxDelay= " + this.maxDelay + "\n-Act1= " + this.getFirst() + "\n-Act2= " + this.getSecond();
+    }
 }

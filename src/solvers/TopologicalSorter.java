@@ -1,6 +1,7 @@
 package solvers;
 
 // ----- imports -----
+
 import constraints.Activity;
 import constraints.PrecedenceConstraint;
 
@@ -15,16 +16,16 @@ public class TopologicalSorter {
         ArrayList<Activity> res = new ArrayList<>();  // le résultat
 
         HashSet<Activity> avecContraintes = new HashSet<>();  // stocke les activités avec des contraintes
-        for (PrecedenceConstraint contrainte: contraintesPreced) {  // trouve les activités avec des contraintes
+        for (PrecedenceConstraint contrainte : contraintesPreced) {  // trouve les activités avec des contraintes
             avecContraintes.add(contrainte.getFirst());
             avecContraintes.add(contrainte.getSecond());
         }
 
         while (!activitesCopy.isEmpty()) {  // tant que la copie d'activite n'est pas vide
             boolean continuer = false;  // on définit continuer à 0
-            for (Activity activite: activitesCopy) {  // pour toutes les activités
+            for (Activity activite : activitesCopy) {  // pour toutes les activités
                 boolean ok = true;  // ok à true
-                for (PrecedenceConstraint contrainte: contraintesPreced) {  // pour toutes les contraintes
+                for (PrecedenceConstraint contrainte : contraintesPreced) {  // pour toutes les contraintes
                     PrecedenceConstraint caDoitEtreCommeCa = new PrecedenceConstraint(activite, contrainte.getSecond());  // sert à vérifier que contrainte est de la bonne forme
                     boolean isSameFirst = Objects.equals(contrainte.getFirst(), caDoitEtreCommeCa.getFirst());  // vérifie que les premières activités sont les mêmes
                     boolean isSameSecond = Objects.equals(contrainte.getSecond(), caDoitEtreCommeCa.getSecond());  // vérifie que les secondes activité sont les mêmes
@@ -46,7 +47,7 @@ public class TopologicalSorter {
                 return null;
             }
         }
-        for (Activity activite: activites) {  // ajoute les éléments non soumis à des contraintes à la fin
+        for (Activity activite : activites) {  // ajoute les éléments non soumis à des contraintes à la fin
             if (!avecContraintes.contains(activite)) {
                 res.add(activite);
             }
@@ -81,16 +82,17 @@ public class TopologicalSorter {
         }
         return res;  // retourne un "calendrier" des activités
     }
+
     public ArrayList<Activity> linearTimeSort(HashSet<Activity> activites, HashSet<PrecedenceConstraint> contraintesPreced) {
         HashMap<Activity, Integer> nbPredecesseurs = new HashMap<>();  // créé le dico des prédecesseurs
         HashMap<Activity, ArrayList<Activity>> successeurs = new HashMap<>();  // créé le dico des successeurs
 
-        for (Activity activite: activites) {
+        for (Activity activite : activites) {
             nbPredecesseurs.put(activite, 0);  // initialise chaque activité à 0
             successeurs.put(activite, new ArrayList<>());  // initialise chaque activité à une liste vide
         }
 
-        for (PrecedenceConstraint contrainte: contraintesPreced) {  // parcours les contraintes
+        for (PrecedenceConstraint contrainte : contraintesPreced) {  // parcours les contraintes
             Activity firstActiv = contrainte.getFirst();  // prend la première activité
             Activity secondActiv = contrainte.getSecond();  // prend la deuxième activité
 
@@ -102,7 +104,7 @@ public class TopologicalSorter {
 
         ArrayList<Activity> L = new ArrayList<>();  // créé la liste L
         ArrayList<Activity> res = new ArrayList<>();  // pour stocker le résultat
-        for (Activity activite: activites) {  // pour toutes les activités
+        for (Activity activite : activites) {  // pour toutes les activités
             int leNombreDePredecesseurs = nbPredecesseurs.get(activite);  // prend le nombre de prédeceseurs de l'activité
             if (leNombreDePredecesseurs == 0) {  // si il n'y en a pas
                 L.add(activite);  // ajoute l'activité à L
@@ -112,7 +114,7 @@ public class TopologicalSorter {
             Activity activ = L.get(0);  // prend la première activité de L
             res.add(activ);  // ajoute cette activité au résultat
             L.remove(activ);  // retire l'activité de L
-            for (Activity activite: successeurs.get(activ)) {  // pour toutes les activités qui succèdent à l'activité
+            for (Activity activite : successeurs.get(activ)) {  // pour toutes les activités qui succèdent à l'activité
                 nbPredecesseurs.replace(activite, nbPredecesseurs.get(activite) - 1);  // décrémente son nombre de prédecesseurs
                 if (nbPredecesseurs.get(activite) == 0) {  // si le nombre de prédecesseurs de l'activité est égal à 0
                     L.add(activite);  // rajoute l'activité à L
