@@ -2,11 +2,10 @@ package solvers.executables;
 
 import constraints.Activity;
 import constraints.PrecedenceConstraint;
+import solvers.RandomScheduler;
 import solvers.TopologicalSorter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Demo {
@@ -66,6 +65,24 @@ public class Demo {
         HashSet<Activity> grosSetActiv = new HashSet<>(grosseListeActiv);
         HashSet<PrecedenceConstraint> grosSetContrainte = new HashSet<>(grosseListeContraintes);
         HashMap<Activity, Integer> calendrier2 = solver1.schedule(grosSetActiv, grosSetContrainte);
+
+        System.out.println("-------------------------------------------");
+
+        Activity uneActiviteSympa = new Activity("ceci est une activité", 5);
+        Activity uneActiviteSympa2 = new Activity("une autre activité sympa", 3);
+
+        Set<Activity> desActivitesSympas = new HashSet<>();
+        desActivitesSympas.add(uneActiviteSympa);
+        desActivitesSympas.add(uneActiviteSympa2);
+
+        Random leRandom = new Random(1722117051601202760L);
+
+
+        RandomScheduler unCalendrieurRandom = new RandomScheduler(leRandom);
+
+        System.out.println(unCalendrieurRandom.generateOneSchedule(desActivitesSympas, 0, 5));
+
+
     }
 
 }

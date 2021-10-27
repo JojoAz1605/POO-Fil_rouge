@@ -3,7 +3,10 @@ package solvers;
 import constraints.Activity;
 import constraints.Constraint;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class RandomScheduler {
     Random instanceRandom;
@@ -19,12 +22,9 @@ public class RandomScheduler {
 
         for (Activity activ : activitySet) {
             int date;
-            if (dateMax - dateMin == 0) {
-                date = dateMin;
-            } else {
-                date = instanceRandom.ints(dateMin, dateMax + 1).findFirst().getAsInt(); // autre version, erreur différente, mais même cause
-                // date = instanceRandom.nextInt(dateMax - dateMin) + dateMin;
-            }
+
+            date = this.instanceRandom.nextInt((dateMax - dateMin) + 1) + dateMin;
+
             // System.out.printf("La date générée pour %s est: %d\n", activ.getDescription(), date);
             edt.put(activ, date);  // ajoute l'activité et une date aléatoire
         }
@@ -33,23 +33,19 @@ public class RandomScheduler {
     }
 
     public Map<Activity, Integer> generateSchedule(Set<Activity> activities, Set<Constraint> constraints, int dateMin, int dateMax, int nbTirages) {
-        Map<Activity, Integer> edt;  // un edt
-        ArrayList<Map<Activity, Integer>> lesEdt = new ArrayList<>();  // stocke les edt générés
+        Map<Activity, Integer> leMeilleur = null;  // le meilleur edt
         Verifier leVerificateur = new Verifier(constraints);  // initialise le vérificateur
 
-        // créé autant d'edt qu'il y a de tirages
         for (int i = 0; i < nbTirages; i++) {
-            lesEdt.add(this.generateOneSchedule(activities, dateMin, dateMax));
-        }
+            Map<Activity, Integer> unNouvelEdt = this.generateOneSchedule(activities, dateMin, dateMax);  // génération d'un edt
+            int tailleContraintesNonSatisNouvelEdt = leVerificateur.unsatisfied(unNouvelEdt).size();  // la taille de la liste des contraintes non satisfaites
 
-        edt = lesEdt.get(0);  // prend le premier edt dans la liste
-
-        for (Map<Activity, Integer> unEdt : lesEdt) {
-            if (leVerificateur.unsatisfied(unEdt).size() <= edt.size()) {  // vérifie si la taille est "mieux" que l'ancienne
-                edt = unEdt;  // si oui, remplace le meilleur edt par celui-là
+            if (leMeilleur == null) {
+                leMeilleur = unNouvelEdt;  // si c'est null, initialise la variable
+            } else if (tailleContraintesNonSatisNouvelEdt == 0) {
+                leMeilleur = unNouvelEdt;  // si la nb de contraintes non satisfaites est "mieux", remplace le meilleur edt
             }
         }
-        System.out.println(edt);
-        return edt;
+        return leMeilleur;  // retourne le meilleur edt
     }
 }

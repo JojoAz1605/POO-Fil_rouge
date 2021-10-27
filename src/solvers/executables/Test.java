@@ -1,6 +1,8 @@
 package solvers.executables;
 
-import solverstests.*;
+import solverstests.RandomSchedulerTests;
+import solverstests.TopologicalSorterTests;
+import solverstests.VerifierTests;
 
 public class Test {
     public static void main(String[] args) {
